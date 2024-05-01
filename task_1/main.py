@@ -2,13 +2,7 @@
 
 from pathlib import Path
 import shutil
-
-
-def parse_input(user_input):
-    """This function parses user input"""
-    command, *args = user_input.split()
-    command = command.strip().lower()
-    return command, *args
+import argparse
 
 
 def copy_files(source_dir: Path, destination_dir: str) -> None:
@@ -37,23 +31,24 @@ def copy_files(source_dir: Path, destination_dir: str) -> None:
 def main():
     """This function prompts user to enter a path to folder and a destination folder"""
 
-    while True:
-        user_input = input("Enter a path to folder to copy and a destination folder: ")
-        command, *args = parse_input(user_input)
+    parser = argparse.ArgumentParser(
+        description="Copy files recursively and sort them by extension."
+    )
+    parser.add_argument("source_dir", type=str, help="Path to the source directory")
+    parser.add_argument(
+        "destination_dir",
+        nargs="?",
+        type=str,
+        default="dist",
+        help='Path to the destination directory (default is "dist")',
+    )
+    args = parser.parse_args()
 
-        if command in ["close", "exit"]:
-            print("Good bye!")
-            break
-        else:
-            folder = command
-            destination = args[0] if len(args) > 0 else "dist"
-            try:
-                copy_files(folder, destination)
-                print("Files copied successfully.")
-                break
-            except Exception as e:
-                print(f"An error occurred: {e}")
-                break
+    try:
+        copy_files(args.source_dir, args.destination_dir)
+        print("Files copied successfully.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 
 if __name__ == "__main__":
